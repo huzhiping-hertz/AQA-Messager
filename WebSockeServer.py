@@ -9,7 +9,7 @@ async def RequestHandler(websocket):
     
     parameters = await websocket.recv()
     print("recv:"+parameters)
- 
+    
     try:
         while True:
             msg="{'tid':1,'lostpacket':0.2,'delay':'2mm','jitter':1,'mos':1}"
