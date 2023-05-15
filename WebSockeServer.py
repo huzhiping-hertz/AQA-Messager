@@ -3,6 +3,7 @@
 import asyncio
 import websockets
 import time
+from WebApi import WebApi
 
 async def RequestHandler(websocket):
     print("newc:connection and waiting parameters....")
@@ -12,9 +13,13 @@ async def RequestHandler(websocket):
     
     try:
         while True:
-            msg="{'tid':1,'lostpacket':0.2,'delay':'2mm','jitter':1,'mos':1}"
-            await websocket.send(msg)
-            print(msg)
+            # msg="{'tid':1,'lostpacket':0.2,'delay':'2mm','jitter':1,'mos':1}"
+            # await websocket.send(msg)
+           
+            api=WebApi()
+            await websocket.send(api.getLostPacket())
+            await websocket.send(api.getJitter())
+            await websocket.send(api.getDelay())
             time.sleep(3)
     finally:
         websocket.close()
