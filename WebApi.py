@@ -32,7 +32,27 @@ class WebApi:
             #obj["src"]=elm["metric"]["source_name"]
             #obj["dst"]=elm["metric"]["destination_name"]
             obj[data_type]=elm["value"][1]
-            
+ 
+    def getFractionLost(self,src,dst):
+        
+        rsObj={"src":src,"dst":dst,"avg":"null","max":"null","min":"null"}
+        
+        avg="query=avg_over_time(aqa_rtcp_fraction_lost{source_name='"+src+"',destination_name='"+dst+"'}[30s])"
+        avg_url=self.url+avg
+        rsq=requests.request(method="Get",url=avg_url)
+        rs=self.pack_single_data(rsObj,"avg",rsq)
+        
+        avg="query=max_over_time(aqa_rtcp_fraction_lost{source_name='"+src+"',destination_name='"+dst+"'}[30s])"
+        avg_url=self.url+avg
+        rsq=requests.request(method="Get",url=avg_url)
+        rs=self.pack_single_data(rsObj,"max",rsq)
+        
+        avg="query=min_over_time(aqa_rtcp_fraction_lost{source_name='"+src+"',destination_name='"+dst+"'}[30s])"
+        avg_url=self.url+avg
+        rsq=requests.request(method="Get",url=avg_url)
+        rs=self.pack_single_data(rsObj,"min",rsq)
+        
+        return rsObj           
     
     def getLostPacket(self,src,dst):
         

@@ -20,13 +20,14 @@ async def process(ws,paramObj):
     api=WebApi()
     try:
         while True:
-            rsObj={"packet_lost":[],"delay":[],"jitter":[]}
+            rsObj={"packet_lost":[],"delay":[],"jitter":[],"fraction_lost":[]}
             for idx,item in enumerate(paramObj):
                 src=item["src"]
                 dst=item["dst"]
                 rsObj["packet_lost"].append(api.getLostPacket(src,dst))
                 rsObj["delay"].append(api.getDelay(src,dst))
                 rsObj["jitter"].append(api.getJitter(src,dst))
+                rsObj["fraction_lost"].append(api.getFractionLost(src,dst))
             print(json.dumps(rsObj))
             await ws.send(json.dumps(rsObj)) 
             await asyncio.sleep(3)
