@@ -4,10 +4,10 @@ import asyncio
 from websockets.sync.client import connect
 
 def DataRequest():
-    uri = "ws://localhost:8000"
+    uri = "ws://172.25.77.3:8000"
     with connect(uri) as websocket:
     
-        parameters = "{'tid':1,'timespan':'20m','src':'172.25.65.38','dst':'172.25.65.239'}"
+        parameters = '[{"src":"172.18.15.66","dst":"172.18.15.67"}]'
         websocket.send(parameters)
         print("send:"+parameters)
 

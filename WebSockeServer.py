@@ -3,29 +3,44 @@
 import asyncio
 import websockets
 import time
+import json
+from threading import Thread
 from WebApi import WebApi
 
-async def RequestHandler(websocket):
-    print("newc:connection and waiting parameters....")
+async def handler(ws):
+
+    while True:
+        params=await ws.recv()
+        paramObj=json.loads(params)
+        asyncio.create_task( process(ws,paramObj))
     
-    parameters = await websocket.recv()
-    print("recv:"+parameters)
     
+async def process(ws,paramObj):
+
+    api=WebApi()
     try:
         while True:
-            # msg="{'tid':1,'lostpacket':0.2,'delay':'2mm','jitter':1,'mos':1}"
-            # await websocket.send(msg)
-           
-            api=WebApi()
-            await websocket.send(api.getLostPacket())
-            await websocket.send(api.getJitter())
-            await websocket.send(api.getDelay())
-            time.sleep(3)
+            rsObj={"packet_lost":[],"delay":[],"jitter":[]}
+            for idx,item in enumerate(paramObj):
+                src=item["src"]
+                dst=item["dst"]
+                rsObj["packet_lost"].append(api.getLostPacket(src,dst))
+                rsObj["delay"].append(api.getDelay(src,dst))
+                rsObj["jitter"].append(api.getJitter(src,dst))
+            print(json.dumps(rsObj))
+            await ws.send(json.dumps(rsObj)) 
+            await asyncio.sleep(3)
     finally:
-        websocket.close()
-        
+        ws.close()
+ 
+async def reqeust(ws):
+    parameters = await ws.recv()
+    print("recv:"+parameters)
+    paramObjs=json.loads(parameters)
+    
+      
 async def main():
-    async with websockets.serve(RequestHandler, "localhost", 8000):
+    async with websockets.serve(handler, "0.0.0.0", 8000):
         await asyncio.Future()  # run forever
 
 if __name__ == "__main__":
